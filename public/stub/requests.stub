@@ -1,0 +1,17 @@
+<?php
+
+namespace DummyNamespace;
+
+class DummyClass extends BaseRequest
+{
+    public function rules()
+    {
+        return [
+        ];
+    }
+
+    public function messages(){
+        return [
+        ];
+    }
+}
