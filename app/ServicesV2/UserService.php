@@ -5,8 +5,7 @@ namespace App\ServicesV2;
 use App\Exceptions\ErrorException;
 use App\Http\ResourcesV2\UserCollection;
 use App\Models\Basic\User;
-use App\Models\Basic\Match;
-use App\Models\Basic\Contact;
+use App\Models\Basic\UserRead;
 use DB;
 
 class UserService
@@ -67,31 +66,7 @@ class UserService
 
         return $info;
     }
-    public function addmatch($id,$data){
-        $business=User::find($id);
-        $save['is_match']='1';
-        $save['match_id']=$data['party_b'];
-        DB::beginTransaction();
-        try {
-            $match['party_a']=$id;
-            $match['party_b']=$data['party_b'];
-            $match['created_at']=now();
-            $business_match = new Match();
-            $business_match->insert($match);
-            $business->update($save);
-            //下面的撮合也要把数据保存下来
-             $savey['is_match']='1';
-             $savey['match_id']=$id;
-             $businessy=User::find($data['party_b']);
-             $businessy->update($savey);
-            DB::commit();
-            return true;
-        }catch (\Exception $e) {
-            DB::rollBack();
-            return $e->getMessage();
-        }
-
-    }
+   
 
     public function store(array $data)
     {
@@ -135,47 +110,21 @@ class UserService
         }
 
     }
-      public function updateMast(User $model, $data){
-        $business=User::find($data['id']);
-        //验证短信是否正确
-        // if (!(new SmsService())->verifyCode($request->tel, $request->code)) {
-        //     return $this->error('验证码错误');
-        // }
-        $savedata['contact']=$data['name'];
-        $savedata['contact_tel']=$data['mobile'];
-        $savedata['id']=$data['id'];
-        return $business->update($savedata);
-    }
 
-    public function update(User $business, $data)
+    public function update(User $user, $data)
     {
         // unset($data['code']);
-
-        return $business->update($data);
+        $user=User::find($data['id']);
+        return $user->update($data);
     }
 
     public function show($id){
 
-        $info = User::with(['agent','contacts','order'])->where(['id'=>$id])->first();
-        //判断企业有没有撮合
-        $dataa = \DB::table('order_match')
-            ->where('party_a', $id)
-            ->count();
-        $datab = \DB::table('order_match')
-            ->where('party_b', $id)
-            ->count();
-        if ($dataa>0 || $datab>0) {
-            $info->match='1';
-        }else{
-            $info->match='0';
-        }
+        $info = User::where(['id'=>$id])->first();
+        //获取阅读篇数
+        $info['read_count']=UserRead::where(['user_id'=>$id,'status'=>'1'])->count();
+       
         return $info;
-    }
-    //添加次要联系人
-    public function toocontacts($data){
-        $data['created_at']=now();
-        $data['updated_at']=now();
-        return Contact::insert($data);
     }
     //编辑次要联系人
     public function updatecontant($id,$data){

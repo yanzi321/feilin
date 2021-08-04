@@ -2,12 +2,9 @@
 
 //登陆
 Route::post('login','AuthController@login');
-Route::post('user', 'UserController@store');
-Route::post('e-saas', 'ESaasController@index');
 Route::any('esign-notify/{type}/{key}','ESaasController@notify');
  //转让内容列表
 Route::get('transfer', 'OrderTransferController@index');
-Route::get('word/{id}', 'ESaasController@word');
 //发送验证码
 Route::post('send-sms', 'BasicController@sendSms');
 //发送验证码
@@ -22,6 +19,7 @@ Route::group(['middleware' => 'frontend.login'], function () {
     //我的品类列表
     Route::get('column', 'UserColumnController@index');
     //修改企业信息
+    Route::get('user', 'UserController@detail');
     Route::put('user', 'UserController@update');
     //添加生词
     Route::post('newword', 'UserNewWordController@store');
@@ -60,12 +58,13 @@ Route::group(['middleware' => 'frontend.login'], function () {
     //添加收藏
     Route::post('enshrine', 'UserEnshrineController@store');
     Route::delete('enshrine/{id}', 'UserEnshrineController@delete');
+    //系统消息
+    Route::get('system', 'UserMessageController@index');
+    Route::get('system/{id}', 'UserMessageController@show');
+    //标记全部已读
+    Route::put('readsystem', 'UserMessageController@readSystem');
     //修改密码
     Route::post('editpassword', 'UserController@editPassword');
     
 
-    //获取下载文档地址
-    Route::get('dowload-documents/{flow_id}', 'ESaasController@dowloadDocuments');
-
-    
 });

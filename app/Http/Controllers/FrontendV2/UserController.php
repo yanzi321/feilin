@@ -6,7 +6,6 @@ namespace App\Http\Controllers\FrontendV2;
 
 use App\Http\RequestsV2\UserRequest;
 use App\ServicesV2\UserService;
-use App\Models\Event\Basic;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use App\Models\Basic\User;
@@ -57,73 +56,26 @@ class UserController extends BaseController
      *
      * @return     <type>                    ( description_of_the_return_value )
      */
-    public function update(Request $request,Business $business)
+    public function update(Request $request,User $user)
     {
         $data=$request->all();
         $data['id']=$request->info->id;
-        if ($this->service->updateBusiness($business,$data)) {
+        if ($this->service->update($user,$data)) {
             return $this->success();
         }
 
         return $this->error();
     }
-    /**
-     * 修改主要联系人
-     */
-    public function updateMastContant(Request $request,Business $business){
-        $data=$request->all();
-        $data['id']=$request->info->id;
-        //判断手机验证码是否正确
-        $query = Basic::checkSms($data['mobile'],$data['code']);
-
-        if($query['code'] != 1){
-            return $this->error($query['message']);
-        }
-        if ($this->service->updateMast($business,$data)) {
-            return $this->success();
-        }
-
-        return $this->error();
-
-    }
-    /**
-     * 添加次要联系人
-     */
-    public function toocontacts(Request $request){
-        $data=$request->all();
-        $data['business_id']=$request->info->id;
-        if ($this->service->toocontacts($data)) {
-            return $this->success();
-        }
-
-        return $this->error();
-
-    }
+   
     /**
      * 公司个人信息
      */
     public function detail(Request $request){
         $business = $this->service->show($request->info->id);
-
-        return $business;
-
-    }
-    public function updateContant($id,Request $request){
-
-        if ($this->service->updateContant($id,$request->all())) {
-            return $this->success();
-        }
-
-        return $this->error();
+        return $this->success($business);
 
     }
-    public function delete($id){
-        if ($this->service->deletecontant($id)) {
-            return $this->success();
-        }
-
-        return $this->error();
-    }
+    
     /**
      * 修改密码
      */
