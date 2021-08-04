@@ -81,12 +81,13 @@ class UserController extends BaseController
      */
     public function editPassword(Request $request){
         $this->validate($request, [
-            'code' => 'required',
-            'contact_tel' => 'required|regex:/^1[3456789]\d{9}$/',
+            'password_old' => 'required',
+            'mobile' => 'required|regex:/^1[3456789]\d{9}$/',
             'password' => 'required',
         ], [
-            'contact_tel.required' => '手机号必填',
-            'contact_tel.regex' => '手机号格式错误',
+            'mobile.required' => '手机号必填',
+            'mobile.regex' => '手机号格式错误',
+            'password_old.required' => '原密码必填',
             'password.required' => '密码必填',
         ]);
         $data=$request->all();
@@ -95,12 +96,12 @@ class UserController extends BaseController
             return $this->error('两次密码不一致');
         }
         //判断手机验证码是否正确
-        $query = Basic::checkSms($data['contact_tel'],$data['code']);
+        /*$query = Basic::checkSms($data['mobile'],$data['code']);
 
         if($query['code'] != 1){
             return $this->error($query['message']);
-        }
-        $data['business_id']=$request->info->id;
+        }*/
+        $data['user_id']=$request->info->id;
         // dd($data);
         if ($this->service->editPassword($data)) {
             return $this->success();
@@ -110,34 +111,59 @@ class UserController extends BaseController
     }
     public function forgetPassword(Request $request){
         $this->validate($request, [
-            'account' => 'required',
+            'mobile' => 'required',
             'code' => 'required',
-            'contact_tel' => 'required|regex:/^1[3456789]\d{9}$/',
+            'mobile' => 'required|regex:/^1[3456789]\d{9}$/',
             'password' => 'required',
         ], [
-            'contact_tel.required' => '手机号必填',
-            'contact_tel.regex' => '手机号格式错误',
+            'mobile.required' => '手机号必填',
+            'mobile.regex' => '手机号格式错误',
             'password.required' => '密码必填',
         ]);
         $data=$request->all();
         // dump($data);
-        if ($data['password'] != $data['password_too']) {
-            return $this->error('两次密码不一致');
-        }
+        
         //判断手机验证码是否正确
-        $query = Basic::checkSms($data['contact_tel'],$data['code']);
+        $query = Basic::checkSms($data['mobile'],$data['code']);
 
         if($query['code'] != 1){
             return $this->error($query['message']);
         }
-        $business=Business::where(['contact_tel'=>$data['contact_tel'],'account'=>$data['account']])->first();
+        $business=User::where(['mobile'=>$data['mobile']])->first();
         if (!$business) {
-            return $this->error('联系人或账号不正确');
+            return $this->error('该手机号没有注册');
         }
         //修改密码
         $save['password']=bcrypt($data['password']);
-        $res=Business::where(['id'=>$business->id])->update($save);
+        $res=User::where(['id'=>$business->id])->update($save);
         if ($res) {
+            return $this->success();
+        }
+        return $this->error();
+
+    }
+    //修改账号
+    public function updateMobile(Request $request){
+        $this->validate($request, [
+            'code' => 'required',
+            'mobile' => 'required|regex:/^1[3456789]\d{9}$/',
+            'password' => 'required',
+        ], [
+            'mobile.required' => '手机号必填',
+            'mobile.regex' => '手机号格式错误',
+            'password.required' => '密码必填',
+        ]);
+        $data=$request->all();
+        // dump($data);
+        //判断手机验证码是否正确
+        $query = Basic::checkSms($data['mobile'],$data['code']);
+
+        if($query['code'] != 1){
+            return $this->error($query['message']);
+        }
+        $data['user_id']=$request->info->id;
+        // dd($data);
+        if ($this->service->editPassword($data)) {
             return $this->success();
         }
         return $this->error();

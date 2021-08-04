@@ -141,7 +141,7 @@ class UserService
      */
     public function editPassword($data){
         $datasave['password']=bcrypt($data['password']);
-        return User::where(['id'=>$data['business_id']])->update($datasave);
+        return User::where(['id'=>$data['user_id']])->update($datasave);
 
     }
 }
