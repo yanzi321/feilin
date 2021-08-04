@@ -5,7 +5,7 @@ namespace App\Http\Controllers\FrontendV2;
 
 
 use App\ServicesV2\UserService;
-use App\ServicesV2\UserLikeService;
+use App\ServicesV2\UserEnshrineService;
 use Illuminate\Http\Request;
 use App\Traits\ApiResponse;
 
@@ -13,13 +13,13 @@ use App\Traits\ApiResponse;
  * Class ActivitySummerCampController
  * @package App\Http\Controllers
  */
-class UserLikeController extends BaseController
+class UserEnshrineController extends BaseController
 {
     use ApiResponse;
 
     protected $service;
 
-    public function __construct(UserLikeService $service)
+    public function __construct(UserEnshrineService $service)
     {
         $this->service = $service;
     }

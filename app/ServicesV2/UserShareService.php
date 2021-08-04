@@ -4,9 +4,9 @@ namespace App\ServicesV2;
 
 use App\Exceptions\ErrorException;
 use App\Http\ResourcesV2\UserColumnCollection;
-use App\Models\Basic\UserLike;
+use App\Models\Basic\UserShare;
 
-class UserLikeService
+class UserShareService
 {
 
     public function collection($params)
@@ -15,7 +15,7 @@ class UserLikeService
         $user_id = $params['user_id'] ?? 0;
         $size = $params['pageSize'] ?? 10;
         $status = isset($params['status']) ?$params['status']: '';
-        $info = UserLike::with(['articleInfo'])->where(['user_id'=>$user_id])
+        $info = UserShare::with(['articleInfo'])->where(['user_id'=>$user_id])
             ->when($status!='', function ($query) use($status) {
                 return $query->where('status',$status);
             })
@@ -34,7 +34,7 @@ class UserLikeService
             throw new ErrorException('got empty data');
         }
 
-        $info = UserLike::create($data);
+        $info = UserShare::create($data);
 
         return $info;
     }
@@ -45,14 +45,14 @@ class UserLikeService
      * @param      <type>  $id     The identifier
      */
     public function delete($id){
-        $order=UserLike::find($id);
+        $order=UserShare::find($id);
         
-        return UserLike::where(['id'=>$id])->delete();
+        return UserShare::where(['id'=>$id])->delete();
 
     }
     //详情
     public function show($id){
-        $article = UserLike::where(['id'=>$id])->first();   
+        $article = UserShare::where(['id'=>$id])->first();   
         return $article;
     }
 

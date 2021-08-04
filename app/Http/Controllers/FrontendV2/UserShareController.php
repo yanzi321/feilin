@@ -5,7 +5,7 @@ namespace App\Http\Controllers\FrontendV2;
 
 
 use App\ServicesV2\UserService;
-use App\ServicesV2\UserReadService;
+use App\ServicesV2\UserShareService;
 use Illuminate\Http\Request;
 use App\Traits\ApiResponse;
 
@@ -19,7 +19,7 @@ class UserShareController extends BaseController
 
     protected $service;
 
-    public function __construct(UserReadService $service)
+    public function __construct(UserShareService $service)
     {
         $this->service = $service;
     }
@@ -50,13 +50,12 @@ class UserShareController extends BaseController
         }
         return $this->error();
     }
-    /**
-     * 一键阅读全部
-     */
-    public function readArticle(){
-        
+    //删除业务
+    public function delete($id){
+        if ($this->service->delete($id)) {
+            return $this->success();
+        }
+        return $this->error();
 
     }
-    
-
 }

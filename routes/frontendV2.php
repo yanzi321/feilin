@@ -46,15 +46,22 @@ Route::group(['middleware' => 'frontend.login'], function () {
     //阅读列表
     Route::get('read', 'UserReadController@index');
     //一键阅读全部
-    Route::put('readarticle', 'UserReadController@readArticle');
+    Route::post('readarticle', 'UserReadController@readArticle');
     //添加笔记
     Route::post('readnote', 'ReadNoteController@store');
     //笔记列表
     Route::get('readnote', 'ReadNoteController@index');
     //添加分享
     Route::post('share', 'UserShareController@store');
+    Route::delete('share/{id}', 'UserShareController@delete');
+    //添加点赞
+    Route::post('like', 'UserLikeController@store');
+    Route::delete('like/{id}', 'UserLikeController@delete');
+    //添加收藏
+    Route::post('enshrine', 'UserEnshrineController@store');
+    Route::delete('enshrine/{id}', 'UserEnshrineController@delete');
     //修改密码
-    Route::put('editpassword', 'UserController@editPassword');
+    Route::post('editpassword', 'UserController@editPassword');
     
 
     //获取下载文档地址

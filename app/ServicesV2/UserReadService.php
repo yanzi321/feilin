@@ -55,5 +55,10 @@ class UserReadService
         $article = UserRead::where(['id'=>$id])->first();   
         return $article;
     }
+    //一键阅读功能
+    public function read_all($data){
+
+        return UserRead::where(['user_id'=>$data['user_id']])->update(['status'=>'1']); 
+    }
 
 }

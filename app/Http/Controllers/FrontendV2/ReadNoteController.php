@@ -50,13 +50,6 @@ class ReadNoteController extends BaseController
         }
         return $this->error();
     }
-    /**
-     * 一键阅读全部
-     */
-    public function readArticle(){
-        
-
-    }
     
 
 }

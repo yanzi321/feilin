@@ -53,8 +53,13 @@ class UserReadController extends BaseController
     /**
      * 一键阅读全部
      */
-    public function readArticle(){
-        
+    public function readArticle(Request $request){
+        $data=$request->all();
+        $data['user_id']=$data['user_id'] ?? $request->info->id;
+        if ($this->service->read_all($data)) {
+            return $this->success();
+        }
+        return $this->error();
 
     }
     

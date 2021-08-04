@@ -93,7 +93,6 @@ class OrderController extends BaseController
             return $this->success();
         }
         return $this->error();
-
     }
 
 }
