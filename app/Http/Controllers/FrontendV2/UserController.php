@@ -167,6 +167,21 @@ class UserController extends BaseController
             return $this->success();
         }
         return $this->error();
+    }
+    public function sorceList(Request $request){
+        $data=$request->all();
+        $data['user_id']=$request->info->id;
+        $info=$this->service->sorceList($data);
+        return $this->success($info);
+
+    }
+    public function gainScore(Request $request){
+        $data=$request->all();
+        $data['user_id']=$request->info->id;
+        if ($this->service->gainScore($data)) {
+            return $this->success();
+        }
+        return $this->error();
 
     }
 

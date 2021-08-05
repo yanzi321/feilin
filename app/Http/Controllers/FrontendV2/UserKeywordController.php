@@ -5,7 +5,7 @@ namespace App\Http\Controllers\FrontendV2;
 
 
 use App\ServicesV2\UserService;
-use App\ServicesV2\UserShareService;
+use App\ServicesV2\UserKeywordService;
 use Illuminate\Http\Request;
 use App\Traits\ApiResponse;
 
@@ -13,13 +13,13 @@ use App\Traits\ApiResponse;
  * Class ActivitySummerCampController
  * @package App\Http\Controllers
  */
-class UserShareController extends BaseController
+class UserKeyWordController extends BaseController
 {
     use ApiResponse;
 
     protected $service;
 
-    public function __construct(UserShareService $service)
+    public function __construct(UserKeywordService $service)
     {
         $this->service = $service;
     }
@@ -29,7 +29,6 @@ class UserShareController extends BaseController
      * @param      \Illuminate\Http\Request  $request  The request
      */
     public function index(Request $request){
-        $data=$request->all();
         $data['user_id']=$data['user_id'] ?? $request->info->id;
         $order= $this->service->collection($data);
         return $this->success($order);
@@ -45,16 +44,26 @@ class UserShareController extends BaseController
         // dd($request->info->id);
         $data=$request->all();
         $data['user_id']=$request->info->id;
+        //获取历史记录
+        
         if ($this->service->store($data)) {
             return $this->success();
         }
         return $this->error();
     }
     //删除业务
-    public function delete($id){
-        if ($this->service->delete($id)) {
+    public function delete(Request $request){
+        if ($this->service->delete($request->info->id)) {
             return $this->success();
         }
         return $this->error();
+
     }
+    //详情
+    public function show($id){
+        $words=$this->service->show($id);
+            return $this->success($words);
+
+    }
+
 }

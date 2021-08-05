@@ -2,6 +2,7 @@
 
 //登陆
 Route::post('login','AuthController@login');
+Route::post('user', 'UserController@store');
 Route::any('esign-notify/{type}/{key}','ESaasController@notify');
  //转让内容列表
 Route::get('transfer', 'OrderTransferController@index');
@@ -21,6 +22,9 @@ Route::group(['middleware' => 'frontend.login'], function () {
     //修改企业信息
     Route::get('user', 'UserController@detail');
     Route::put('user', 'UserController@update');
+    Route::post('gainscore', 'UserController@gainScore');
+    //积分账单
+    Route::get('scorelist', 'UserController@sorceList');
     //添加生词
     Route::post('newword', 'UserNewWordController@store');
     //生词列表
@@ -63,6 +67,16 @@ Route::group(['middleware' => 'frontend.login'], function () {
     Route::get('system/{id}', 'UserMessageController@show');
     //标记全部已读
     Route::put('readsystem', 'UserMessageController@readSystem');
+    //历史关键字
+    Route::get('keywords', 'UserKeyWordController@index');
+    Route::post('keywords', 'UserKeyWordController@store');
+    //清除历史记录
+    Route::delete('keywords', 'UserKeyWordController@delete');
+
+    
+    //修改用户设置
+
+    
     //修改密码
     Route::post('editpassword', 'UserController@editPassword');
     

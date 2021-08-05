@@ -6,6 +6,8 @@ use App\Exceptions\ErrorException;
 use App\Http\ResourcesV2\UserCollection;
 use App\Models\Basic\User;
 use App\Models\Basic\UserRead;
+use App\Models\Basic\UserScore;
+use App\Models\Basic\ScoreSet;
 use DB;
 
 class UserService
@@ -73,8 +75,32 @@ class UserService
         if (empty($data)) {
             throw new ErrorException('got empty data');
         }
+            $user=User::create($data);
+        DB::beginTransaction();
+        try {
+            // $contants[0]['name']='zhangsan';
+            // $contants[0]['mobile']='151611343';
+            if ($data['invite_id']) {
+                $scoreset=ScoreSet::where(['type'=>'1'])->first()->toArray();
+                if (!empty($scoreset)) {
+                    $userscore['score']=$scoreset['score'];
+                    $userscore['user_id']=$data['invite_id'];
+                    $userscore['invite']=$user->id;
+                    $userscore['type']='1';
+                    $userscore['gain_id']=$scoreset['id'];
+                    UserScore::create($userscore);
+                }
+                //添加总积分
+                User::where(['id'=>$data['invite_id']])->increment('score',$scoreset['score']);
+            }
+            DB::commit();
+            return true;
+        }catch (\Exception $e) {
+            DB::rollBack();
+            return $e->getMessage();
+        }
 
-        return User::create($data);
+        // return User::create($data);
     }
     /**
      * { function_description }
@@ -142,6 +168,55 @@ class UserService
     public function editPassword($data){
         $datasave['password']=bcrypt($data['password']);
         return User::where(['id'=>$data['user_id']])->update($datasave);
+
+    }
+    //积分账单
+    public function sorceList($data){
+        //查询所得所有积分
+        $count=User::count();
+        //获取当前
+        $userobj=User::where(['id'=>$data['user_id']])->first();
+        $countwin=User::where('score', '<',$userobj->score)->count();
+        $win=sprintf("%.2f",($countwin/$count))*100;
+        $return['win']=$win;
+        //获取分数
+        $return['score']=$userobj->score;
+        //
+        $return['gain_score']=UserScore::where(['user_id'=>$data['user_id'],'type'=>'1'])->sum('score');
+        $return['user_up']=UserScore::where(['user_id'=>$data['user_id'],'type'=>'2'])->sum('score');
+        //获取记录
+        $size = $data['pageSize'] ?? 10;
+        $sort = $data['sort'] ?? 'desc';
+        
+        $info = UserScore::with('scoreInfo')->orderBy('id',$sort)
+        ->where(['user_id'=>$data['user_id']])
+            ->paginate($size);
+        
+        // $info = new UserCollection($info);
+        $return['info']=$info;
+        // dd($return);
+        return $return;
+    }
+    public function gainScore($data){
+        DB::beginTransaction();
+        try {
+                $scoreset=ScoreSet::where(['type'=>'1'])->first()->toArray();
+                if (!empty($scoreset)) {
+                    $userscore['score']=$scoreset['score'];
+                    $userscore['user_id']=$data['user_id'];
+                    $userscore['invite']='';
+                    $userscore['type']='1';
+                    $userscore['gain_id']=$scoreset['id'];
+                    UserScore::create($userscore);
+                //添加总积分
+                User::where(['id'=>$data['user_id']])->increment('score',$scoreset['score']);
+            }
+            DB::commit();
+            return true;
+        }catch (\Exception $e) {
+            DB::rollBack();
+            return $e->getMessage();
+        }
 
     }
 }
